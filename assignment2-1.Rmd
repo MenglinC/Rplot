@@ -1,0 +1,314 @@
+---
+title: "Assignment2_1"
+author: "wang"
+date: "2023-02-11"
+output: html_document
+---
+
+### Assignment2
+### Low Birth Weight
+### Analysis1-1: Conduct some basic summary statistics to explore the data, such as the proportion of low birth
+weights, proportion of smokers, mean birth weight, etc.
+
+
+```{r echo=FALSE}
+#install.packages("MASS")
+library(MASS)
+library(ggplot2)
+library(ggforce)
+library(rstatix)
+library(ggpubr)
+```
+
+### Compute the proportion of low birth weight baby in this dataset
+### Draw the pie plot to visualize the proportion
+```{r low weight baby echo=FALSE}
+n<-dim(birthwt)[1]
+low<-as.data.frame(table(birthwt$low))
+levels(low$Var1)<-c("health(>2.5kg)","low weight(<2.5kg)")
+pro1<-low[1,2]/n
+pro2<-low[2,2]/n
+pros1<-sprintf("%1.2f%%",pro1*100)
+pros2<-sprintf("%1.2f%%",pro2*100)
+
+low$proportion<-c(pros1,pros2)
+low
+
+p1<-ggplot()+
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.ticks = element_blank(), 
+        axis.text.y = element_blank(),
+        axis.text.x = element_blank(),
+        legend.title=element_blank(), 
+        panel.border = element_blank(),
+        panel.background = element_blank())+#去除没用的ggplot背景，坐标轴
+  labs(title="Low weight baby proportion")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  xlab("")+ylab('')+#添加颜色
+  scale_fill_manual(values = c('#E5D2DD', '#53A85F'))+
+  geom_arc_bar(data=low,
+               stat = "pie",
+               aes(x0=0,y0=0,r0=0,r=2,
+                   amount=Freq,fill=Var1)
+  )+#饼图
+  annotate("text",x=2.2,y=0,label=pros1,angle=-90)+
+  annotate("text",x=-1.6,y=1.5,label=pros2,angle=45)
+
+p1
+#fig<-"low"
+#name<-paste(paste("./",fig,sep = ""),"pdf",sep = ".")
+#ggsave(p1, file=name, width=5.5,height=4)
+```
+
+
+### Compute the proportion of smokers in this dataset
+### Draw the pie plot to visualize the proportion
+```{r smoke echo=FALSE}
+n<-dim(birthwt)[1]
+#head(birthwt)
+smoker<-as.data.frame(table(birthwt$smoke))
+levels(smoker$Var1)<-c("Non-smoker","Smoker")
+pro3<-smoker[1,2]/n
+pro4<-smoker[2,2]/n
+pros3<-sprintf("%1.2f%%",pro3*100)
+pros4<-sprintf("%1.2f%%",pro4*100)
+
+smoker$proportion<-c(pros3,pros4)
+smoker
+
+p2<-ggplot()+
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.y = element_blank(),
+        axis.text.x = element_blank(),
+        legend.title=element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank())+#去除没用的ggplot背景，坐标轴
+  labs(title="Maternal smoking proportion")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  xlab("")+ylab('')+#添加颜色
+  scale_fill_manual(values = c("#F1BB72","#D6E7A3"))+
+  geom_arc_bar(data=smoker,
+               stat = "pie",
+               aes(x0=0,y0=0,r0=0,r=2,
+                   amount=Freq,fill=Var1)
+  )+#饼图
+  annotate("text",x=2.2,y=0,label=pros3,angle=-90)+
+  annotate("text",x=-1.6,y=1.5,label=pros4,angle=45)
+
+p2
+#fig<-"smoker"
+#name<-paste(paste("./",fig,sep = ""),"pdf",sep = ".")
+#ggsave(p2, file=name, width=5.5,height=4)
+
+```
+
+### Compute the proportion of hypertension patients in this dataset
+### Draw the pie plot to visualize the proportion
+```{r ht}
+n<-dim(birthwt)[1]
+#head(birthwt)
+ht<-as.data.frame(table(birthwt$ht))
+levels(ht$Var1)<-c("Health","Hypertension")
+pro5<-ht[1,2]/n
+pro6<-ht[2,2]/n
+pros5<-sprintf("%1.2f%%",pro5*100)
+pros6<-sprintf("%1.2f%%",pro6*100)
+
+ht$proportion<-c(pros5,pros6)
+ht
+
+
+p3<-ggplot()+
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.y = element_blank(),
+        axis.text.x = element_blank(),
+        legend.title=element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank())+#去除没用的ggplot背景，坐标轴
+  labs(title="Maternal hypertension proportion")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  xlab("")+ylab("")+#添加颜色
+  scale_fill_manual(values = c("#57C3F3","#E59CC4"))+
+  geom_arc_bar(data=ht,
+               stat = "pie",
+               aes(x0=0,y0=0,r0=0,r=2,
+                   amount=Freq,fill=Var1)
+  )+#饼图
+  annotate("text",x=2.2,y=0,label=pros5,angle=-90)+
+  annotate("text",x=-0.6,y=2.1,label=pros6,angle=15)
+
+p3
+#fig<-"ht"
+#name<-paste(paste("./",fig,sep = ""),"pdf",sep = ".")
+#ggsave(p3, file=name, width=5.5,height=4)
+
+```
+
+### Compute the distribution of mothers' age in this dataset
+### Draw the density plot to visualize the distribution
+```{r}
+p4<-ggplot(birthwt, aes(x=age)) + 
+     geom_histogram(aes(y=..density..),
+                    binwidth=.5,
+                    colour="black", fill="white") +
+     geom_density(alpha=.2, fill="#FF6666")+
+     labs(title="Density distribution of mother age")+
+     xlab("age")+ylab("density")+
+     theme_classic()+
+     theme(plot.title = element_text(hjust = 0.5))
+    
+p4
+```
+
+
+### Compute the distribution of mothers' weight in this dataset
+### Draw the density plot to visualize the distribution
+```{r}
+p5<-ggplot(birthwt, aes(x=lwt)) +
+     geom_histogram(aes(y=..density..),
+                    binwidth=.5,
+                    colour="black", fill="white") +
+     geom_density(alpha=.2, fill="#FF6666")+
+     labs(title="Density distribution of mother's weight(pounds)")+
+     xlab("weight")+ylab("density")+
+     theme_classic()+
+       theme(plot.title = element_text(hjust = 0.5))
+p5
+```
+### Compute the some statisic parameters birth weight in this dataset
+```{r}
+bwtMean<-mean(birthwt$bwt)
+bwtMean
+max(birthwt$bwt)
+min(birthwt$bwt)
+median(birthwt$bwt)
+```
+```{r}
+summary<-rbind(low,smoker,ht)
+summary
+```
+
+### SUMMAY
+From the above exploratory dataset,we may conclude these points.
+(1)For the baby weight,68.78% baby's weight is considered to be healthy(>2.5kg),while 31.22% babys may suffer from low weight.The average weight of the babys is 2944.567g(>2.5kg);the median weight of the babys is 2977g;the maxinum weight of the babys is 4990g;the minimum weight of the babys is 709g.
+(2)For the lifestyle and disease history of the mother,there is 39.15% mothers smokers and 6.35% mothers haing the hypertension.
+(3)For the age and weight ,the age of mathers is between 18-25;and the weight of mothers is between 100-130;
+
+### Analysis1-2. Calculate the relative risk of having a low-birth weight infant given the following
+```{r}
+birthwt[birthwt$age>=20,"ageStatus"]<-"Old"
+birthwt[birthwt$age<20,"ageStatus"]<-"Young"
+birthwt$ftv<-factor(birthwt$ftv)
+levels(birthwt$ftv)<-c("0","1","2","3","4","6")
+model <- lm(bwt ~ ., data = birthwt)
+summary(model)
+```
+From the analysis result,we may conclude:
+(1) ui is highly related to the baby birth weight;and then is the pregnant race and smoking lifestyle. 
+
+
+2a. Smoking status
+### Use the wilcox.test to compare whether the smoke lifestyles sighificantly affect the baby birth weight.
+### The P value is 0.00677,it means if the mother smoke,her baby's weight have the high risk to be lower.
+```{r}
+birthwt$smoke<-factor(birthwt$smoke)
+levels(birthwt$smoke)<-c("Non-smoker","Smoker")
+stat.test <- birthwt %>%
+  wilcox_test(bwt~smoke)%>%
+  adjust_pvalue(method = "bonferroni") %>%
+  add_significance("p.adj")%>%
+  add_xy_position(x = "smoke",
+                  fun="max",
+                  step.increase=0.2)
+stat.test
+p6<-ggplot(birthwt,aes(x=smoke,y=bwt))+
+    geom_violin()+
+    geom_boxplot(width=0.1)+
+    stat_pvalue_manual(stat.test,label = "p.adj.signif")+
+    xlab("smoke or not")+ylab("brith weight(g)")+
+    theme_classic()
+    
+p6
+```
+
+2b. Hypertension status
+### Use the wilcox.test to compare whether the diease history will sighificantly affect the baby birth weight.
+### The P value is 0.118,it means the hypertension have no influence to the baby's weight.
+
+```{r}
+birthwt$ht<-factor(birthwt$ht)
+levels(birthwt$ht)<-c("Health","Hypertension")
+stat.test2 <- birthwt %>%
+  wilcox_test(bwt~ht)%>%
+  adjust_pvalue(method = "bonferroni") %>%
+  add_significance("p.adj")%>%
+  add_xy_position(x = "ht",
+                  fun="max",
+                  step.increase=0.2)
+stat.test2
+p5<-ggplot(birthwt,aes(x=ht,y=bwt))+
+    geom_violin()+
+    geom_boxplot(width=0.1)+
+    stat_pvalue_manual(stat.test2,label = "p.adj.signif")+
+    #scale_fill_brewer(palette="Dark2")+
+    xlab("hypertension or not")+ylab("brith weight(g)")+
+    theme_classic()
+    
+p5
+```
+
+
+2c. Attending 0 prenatal care visits
+### Use the Kruskal-Wallis test to compare whether the fv will sighificantly affect the baby birth weight.
+### The P value is 0.323,it means the fv(0,1,2,3,4,6) have no influence to the baby's weight.
+
+```{r}
+
+res.kruskal <- birthwt %>% kruskal_test(ftv ~ bwt)
+res.kruskal
+```
+
+2d. Giving birth before age 20
+### Use the Kruskal-Wallis test to compare whether the mother age will sighificantly affect the baby birth weight.
+### The P value is 0.479,it means the mother age have no influence to the baby's weight.
+
+```{r}
+res.kruskal2 <- birthwt %>% kruskal_test(ageStatus ~ bwt)
+res.kruskal2
+```
+
+### Supplement for curiosity:white mother may have the low risk to bore the low weight baby compared to other race? 
+```{r}
+birthwt$race<-factor(birthwt$race)
+levels(birthwt$race)<-c("white","black","other")
+res.kruskal0<-birthwt %>%kruskal_test(bwt~race)
+res.kruskal0
+stat.test0 <- birthwt %>%
+   dunn_test(bwt~race,p.adjust.method = "fdr")%>%
+   add_significance("p.adj")%>%
+   add_xy_position(x = "race",
+                   fun="max",
+                   step.increase=0.2)
+stat.test0
+p<-ggplot(birthwt,aes(x=race,y=bwt))+
+     geom_violin()+
+     geom_boxplot(width=0.1)+
+     stat_pvalue_manual(stat.test0,label = "p.adj.signif")+
+     #scale_fill_brewer(palette="Dark2")+
+     xlab("race")+ylab("brith weight(g)")+
+     theme_classic()
+
+p
+```
+
+###Analysis1-3. What conclusions can you draw from your analysis?
+
+Conclusion:Apart from some condition that we can not control,such as uterine irritation and race,the lifestyle of the pregnant may be the contributor of the baby's low weight. 
+
+
+
