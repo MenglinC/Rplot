@@ -1,5 +1,5 @@
 ################################################################################
-#�Ƚ����򵥵�����ɣ�ͳ����91��ϸ�������͵�ͻ���count��Ŀ
+#先解决最简单的任务吧，统计这91个细胞各类型的突变的count数目
 
 
 count_class<-function(file,cell){
@@ -150,9 +150,9 @@ cell_count<-rbind(cell1,cell2,cell3,cell4,cell5,cell6,cell7,cell8,cell9,cell10,
                   cell61,cell62,cell63,cell64,cell66,cell67,cell68,cell69,cell70,
                   cell71,cell72,cell73,cell74,cell75,cell76,cell77,cell78,cell79,cell80,
                   cell81,cell82,cell83,cell84,cell85,cell86,cell87,cell88,cell89,cell90)
-#ȱ65
-#boxplot(Freq~Var1,cell_count) #ע����������λ��
-#�о��е�����
+#缺65
+#boxplot(Freq~Var1,cell_count) #注意两参数的位置
+#感觉有点问题
 #cell_count$Var1
 #table(cell_count$Var1)
 cell_count$Var1<-droplevels(cell_count$Var1)
